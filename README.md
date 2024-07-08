@@ -1,3 +1,7 @@
+## Git
+git remote add nestjs-default https://github.com/tiennguyen12g/nestjs-default.git
+git push -u nestjs-default main
+
 ## Initial setup NestJS project
 1. Install nestjs in global if it has not installed yet:
 ```
@@ -85,8 +89,55 @@ import { ConfigModule } from '@nestjs/config';
 })
 export class AppModule {}
 ```
+### Setup validator for body request
+1. Install
+```
+npm i zod
+```
+2. In "src" create file "valistion.pipe.ts" and add:
+```
+import { PipeTransform, Injectable, ArgumentMetadata, BadRequestException } from '@nestjs/common';
+import { ZodSchema } from 'zod';
 
+@Injectable()
+export class ZodValidationPipe implements PipeTransform {
+  constructor(private schema: ZodSchema<any>, private action: string) {}
 
+  transform(value: any, metadata: ArgumentMetadata) {
+    const validation = this.schema.safeParse(value);
+    if (!validation.success) {
+      throw new BadRequestException({
+        action: this.action,
+        message: 'Validation failed',
+        errors: validation.error.errors,
+      });
+    }
+    return validation.data;
+  }
+}
+
+```
+
+### 4. Connect MongoDB
+1. Install
+```
+npm i @nestjs/mongoose mongoose
+```
+2. Import to app.module.ts
+```
+import { Module } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
+
+@Module({
+  imports: [MongooseModule.forRoot('mongodb://localhost/nest')],
+})
+export class AppModule {}
+```
+## How nestjs work
+1. Controller
+It receives the request from client.
+2. Service
+Handle the request
 
 ## Installation
 
